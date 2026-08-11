@@ -2,52 +2,71 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AndaYa Admin - Panel de Control & Ley EAT</title>
-  <meta name="description" content="Panel de administración global para AndaYa: Gestión de flotas, aprobación Ley EAT y configuración de suscripciones.">
-  
-  <!-- Google Fonts -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AndaYa Admin — Backoffice Global & Ley EAT</title>
+  <meta name="description" content="Panel de administración global para AndaYa: Supervisión de flotas en vivo, aprobación Ley EAT 21.553 y tarifas.">
+  <meta name="theme-color" content="#050810">
+
+  <!-- Google Fonts: Outfit + Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 
-  <!-- Style CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="admin-app">
-    <!-- Sidebar Navigation -->
-    <aside class="admin-sidebar">
-      <div class="sidebar-brand">
-        <span class="brand-icon">🛡️</span>
-        <div>
-          <h1>AndaYa Admin</h1>
-          <span class="version">Backoffice v1.0 • Ley EAT</span>
+
+    <!-- ===== SIDEBAR NAVEGACIÓN COLAPSABLE ===== -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-brand">
+          <div class="brand-emblem">
+            <span class="brand-icon">🛡️</span>
+            <div class="brand-glow"></div>
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-name">AndaYa <span class="brand-tag">Admin</span></h1>
+            <span class="version-badge">Ley EAT 21.553</span>
+          </div>
         </div>
+
+        <!-- Botón de Colapsar / Expandir Menú -->
+        <button class="btn-toggle-sidebar" id="btn-toggle-sidebar" title="Expandir/Contraer Menú (Ctrl+B)">
+          <svg class="toggle-icon icon-collapse" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
       </div>
 
       <nav class="sidebar-menu">
-        <button class="menu-item active" data-tab="tab-fleet">
-          <span class="icon">🗺️</span> Mapa de Flota en Vivo
+        <button class="menu-item active" data-tab="tab-fleet" title="Mapa de Flota en Vivo">
+          <span class="menu-icon">🗺️</span>
+          <span class="menu-label">Mapa de Flota</span>
         </button>
-        <button class="menu-item" data-tab="tab-verification">
-          <span class="icon">📋</span> Verificación Ley EAT <span class="badge-count" id="pending-count">3</span>
+        <button class="menu-item" data-tab="tab-verification" title="Verificación Ley EAT">
+          <span class="menu-icon">📋</span>
+          <span class="menu-label">Ley EAT 21.553</span>
+          <span class="badge-count" id="pending-count">3</span>
         </button>
-        <button class="menu-item" data-tab="tab-trips">
-          <span class="icon">🚗</span> Monitor de Viajes
+        <button class="menu-item" data-tab="tab-trips" title="Monitor de Viajes">
+          <span class="menu-icon">🚗</span>
+          <span class="menu-label">Monitor Viajes</span>
         </button>
-        <button class="menu-item" data-tab="tab-settings">
-          <span class="icon">⚙️</span> Tarifas y Suscripciones
+        <button class="menu-item" data-tab="tab-settings" title="Tarifas y Suscripciones">
+          <span class="menu-icon">⚙️</span>
+          <span class="menu-label">Tarifas & Config</span>
         </button>
       </nav>
 
       <div class="sidebar-footer">
         <div class="user-mini">
-          <span class="avatar">👨‍💼</span>
-          <div>
+          <div class="avatar-wrap">
+            <span class="avatar">👨‍💼</span>
+            <span class="user-status-dot"></span>
+          </div>
+          <div class="user-info">
             <span class="name">Admin Principal</span>
             <span class="role">Supervisión Chile</span>
           </div>
@@ -55,61 +74,98 @@
       </div>
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <main class="admin-main">
-      <!-- Top Metrics Dashboard Bar -->
-      <header class="metrics-bar">
-        <div class="metric-card">
-          <span class="metric-label">Choferes Conectados</span>
-          <div class="metric-value">
-            <span class="val" id="metric-online-drivers">142</span>
-            <span class="trend positive">🟢 En línea</span>
+
+      <!-- Topbar Header con Botón Menú Mobile y Métricas -->
+      <header class="top-header">
+        <div class="top-header-left">
+          <button class="btn-mobile-menu" id="btn-mobile-menu" title="Abrir Menú">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </button>
+          <div class="page-title-wrap">
+            <h2 class="page-title" id="page-title">Supervisión de Flota Geográfica</h2>
+            <span class="live-indicator"><span class="pulse-dot"></span> Tiempo Real</span>
           </div>
         </div>
 
-        <div class="metric-card">
-          <span class="metric-label">Viajes Activos</span>
-          <div class="metric-value">
-            <span class="val" id="metric-active-trips">34</span>
-            <span class="trend">⚡ En curso</span>
-          </div>
-        </div>
-
-        <div class="metric-card">
-          <span class="metric-label">Ingresos por Suscripción (Mes)</span>
-          <div class="metric-value">
-            <span class="val">$4.260.000</span>
-            <span class="clp">CLP</span>
-          </div>
-        </div>
-
-        <div class="metric-card highlight">
-          <span class="metric-label">Comisión Cobrada por Viaje</span>
-          <div class="metric-value">
-            <span class="val zero-text">0%</span>
-            <span class="trend positive">✨ Modelo Justo</span>
+        <div class="top-header-right">
+          <div class="zero-comm-pill">
+            <span>⚡ 0% Comisión</span>
           </div>
         </div>
       </header>
 
+      <!-- Bar de Métricas del Dashboard -->
+      <section class="metrics-bar">
+        <div class="metric-card">
+          <div class="metric-icon-wrap blue">🚗</div>
+          <div class="metric-body">
+            <span class="metric-label">Choferes Conectados</span>
+            <div class="metric-value">
+              <span class="val" id="metric-online-drivers">142</span>
+              <span class="trend positive">🟢 En línea</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap cyan">⚡</div>
+          <div class="metric-body">
+            <span class="metric-label">Viajes Activos</span>
+            <div class="metric-value">
+              <span class="val" id="metric-active-trips">34</span>
+              <span class="trend blue-trend">En curso</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon-wrap green">💰</div>
+          <div class="metric-body">
+            <span class="metric-label">Ingresos Suscripción (Mes)</span>
+            <div class="metric-value">
+              <span class="val">$4.260.000</span>
+              <span class="currency-tag">CLP</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card highlight-zero">
+          <div class="metric-icon-wrap gold">✦</div>
+          <div class="metric-body">
+            <span class="metric-label">Comisión por Viaje</span>
+            <div class="metric-value">
+              <span class="val zero-val">0%</span>
+              <span class="trend green-trend">✨ Modelo Justo</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- TAB 1: Mapa de Flota en Vivo -->
       <section class="admin-tab active" id="tab-fleet">
-        <div class="map-view-header">
-          <h2>Supervisión de Flota Geográfica</h2>
-          <div class="map-actions">
+        <div class="tab-subbar">
+          <div class="map-filters">
             <button class="btn-filter active">Todos (142)</button>
             <button class="btn-filter">En Viaje (34)</button>
             <button class="btn-filter">Disponibles (108)</button>
+          </div>
+          <div class="map-legend">
+            <span class="legend-item"><span class="leg-dot green"></span> Disponible</span>
+            <span class="legend-item"><span class="leg-dot blue"></span> En Carrera</span>
           </div>
         </div>
         <div id="admin-map" class="admin-map-container"></div>
       </section>
 
-      <!-- TAB 2: Verificación de Conductores Ley EAT 21.553 -->
+      <!-- TAB 2: Verificación Ley EAT 21.553 -->
       <section class="admin-tab" id="tab-verification">
-        <div class="tab-header">
-          <h2>Solicitudes de Conductores (Requisitos Ley EAT)</h2>
-          <p>Revisión de licencias A-1/A-2, certificados de antecedentes y padrón del vehículo.</p>
+        <div class="tab-card-header">
+          <div>
+            <h3>Solicitudes de Conductores (Ley EAT 21.553)</h3>
+            <p>Verificación de licencias profesionales Clase A-1/A-2, certificados de antecedentes y padrón del vehículo.</p>
+          </div>
         </div>
 
         <div class="table-container">
@@ -174,8 +230,11 @@
 
       <!-- TAB 3: Monitor de Viajes -->
       <section class="admin-tab" id="tab-trips">
-        <div class="tab-header">
-          <h2>Monitor de Viajes en Tiempo Real</h2>
+        <div class="tab-card-header">
+          <div>
+            <h3>Monitor de Viajes en Tiempo Real</h3>
+            <p>Seguimiento continuo de la flota en carrera con desglose de tarifa 100% directa al chofer.</p>
+          </div>
         </div>
         <div class="table-container">
           <table class="admin-table">
@@ -184,26 +243,26 @@
                 <th>ID Viaje</th>
                 <th>Pasajero</th>
                 <th>Conductor</th>
-                <th>Ruta (Origen -> Destino)</th>
+                <th>Ruta (Origen → Destino)</th>
                 <th>Tarifa Transparente</th>
                 <th>Estado</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><code>#TRIP-9041</code></td>
+                <td><code class="code-badge">#TRIP-9041</code></td>
                 <td>Valentina R.</td>
                 <td>Carlos Muñoz (AB-CD-12)</td>
-                <td>Santiago Centro $\rightarrow$ Providencia</td>
-                <td><strong>$4.200 CLP</strong> (100% chofer)</td>
+                <td>Santiago Centro → Providencia</td>
+                <td><strong class="green-price">$4.200 CLP</strong> (100% chofer)</td>
                 <td><span class="badge-status active-trip">EN CURSO</span></td>
               </tr>
               <tr>
-                <td><code>#TRIP-9040</code></td>
+                <td><code class="code-badge">#TRIP-9040</code></td>
                 <td>Matías L.</td>
                 <td>Gonzalo Perez (KX-12-90)</td>
-                <td>Las Condes $\rightarrow$ Vitacura</td>
-                <td><strong>$5.800 CLP</strong> (100% chofer)</td>
+                <td>Las Condes → Vitacura</td>
+                <td><strong class="green-price">$5.800 CLP</strong> (100% chofer)</td>
                 <td><span class="badge-status completed">COMPLETADO</span></td>
               </tr>
             </tbody>
@@ -211,15 +270,18 @@
         </div>
       </section>
 
-      <!-- TAB 4: Tarifas y Configuración de Suscripción -->
+      <!-- TAB 4: Configuración y Tarifas -->
       <section class="admin-tab" id="tab-settings">
-        <div class="tab-header">
-          <h2>Configuración de Modelo de Negocio (Suscripciones)</h2>
+        <div class="tab-card-header">
+          <div>
+            <h3>Configuración del Modelo de Negocio</h3>
+            <p>Gestión de planes de suscripción para choferes y parámetros del algoritmo de tarifas.</p>
+          </div>
         </div>
 
         <div class="settings-grid">
           <div class="settings-card">
-            <h3>Planes de Suscripción para Choferes</h3>
+            <h3>Planes de Suscripción (Choferes)</h3>
             <div class="setting-item">
               <label>Suscripción Mensual (CLP)</label>
               <input type="number" value="30000" id="sub-monthly">
@@ -232,11 +294,11 @@
               <label>Pase Diario (CLP)</label>
               <input type="number" value="1500" id="sub-daily">
             </div>
-            <button class="btn-save" onclick="alert('✅ Configuración de suscripciones guardada')">Guardar Planes</button>
+            <button class="btn-save" onclick="saveSettings('Planes de suscripción guardados')">Guardar Planes</button>
           </div>
 
           <div class="settings-card">
-            <h3>Reglas de Tarifa Transparente (Pasajero)</h3>
+            <h3>Reglas de Tarifa Transparente</h3>
             <div class="setting-item">
               <label>Bajada de Bandera Base ($ CLP)</label>
               <input type="number" value="500" id="rate-base">
@@ -249,12 +311,16 @@
               <label>Tarifa por Minuto ($ CLP/min)</label>
               <input type="number" value="60" id="rate-min">
             </div>
-            <button class="btn-save" onclick="alert('✅ Parámetros de tarifa guardados')">Guardar Reglas de Tarifa</button>
+            <button class="btn-save" onclick="saveSettings('Parámetros de tarifa guardados')">Guardar Reglas</button>
           </div>
         </div>
       </section>
+
     </main>
   </div>
+
+  <!-- Backdrop para Mobile -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>

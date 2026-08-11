@@ -1,11 +1,11 @@
 ## [ESTADO ACTUAL] Última actualización: 2026-08-11 | Dominio: dev/AndaYa
-- Objetivo Activo: Fase 4 - Rediseño Visual UI/UX Premium o Fase 5 - Conexión a Supabase (Decisión del usuario).
-- Última Acción: Code Review completo + corrección de 7 issues (bug real en fareService fallback, URL hardcodeada, dead code, O(n) disconnect, fuente de verdad duplicada, alert() nativo, coordenada duplicada en admin-map).
-- Decisiones/Bloqueos: Base de código optimizada y limpia. Ningún bug crítico pendiente. Listo para la siguiente fase de desarrollo.
-- Siguiente Paso: Iniciar Fase 4 (Rediseño UI/UX) o Fase 5 (Conexión Supabase).
+- Objetivo Activo: Fase 4 - Rediseño UI/UX Premium completado para la App Pasajero. Pendiente: App Conductor y Panel Admin.
+- Última Acción: Rediseño completo del Design System Dark Premium (v2.0) para la App Pasajero: tokens CSS, glassmorphism, animación de tarifa, radar neon, tipografía Outfit+Plus Jakarta Sans, paleta de marca propia.
+- Decisiones/Bloqueos: Dirección visual confirmada: Dark Premium (negro profundo, azul eléctrico #2563EB, neón cian #06B6D4, verde esmeralda #10B981). 
+- Siguiente Paso: Aplicar el mismo Design System a la App Conductor y el Panel Admin, o refinar la App Pasajero según feedback.
 
 ## Historial Reciente
-- 2026-08-11: Code review + corrección de 7 issues en backend (server, fareService, tripController, tripSocketHandler) y 3 apps (passenger, driver, admin).
+- 2026-08-11: Fase 4 - Rediseño premium de la App Pasajero (Design System v2.0) con Dark Glass, radar animado, animación de tarifa y sistema de tokens CSS.
+- 2026-08-11: Code review + corrección de 7 issues en backend y 3 apps.
 - 2026-08-11: Lista máster de fases completadas (F1, F2, F3) y fases pendientes (F4 a F8).
-- 2026-08-11: Creación del Panel Web de Administración (`admin-app/`) servido en `/admin` con aprobación Ley EAT y gestión de suscripciones.
-- 2026-08-11: Creación de la App Conductor (`driver-app/`) servida en `/driver` con recepción de viajes y taxímetro.
+- 2026-08-11: Creación y despliegue del Panel Web de Administración y App Conductor.
