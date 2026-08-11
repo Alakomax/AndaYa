@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AndaYa - Pide. Sube. AndaYa.</title>
+  <meta name="description" content="AndaYa es la app latinoamericana que conecta pasajeros y conductores para moverse de forma rápida, segura y transparente.">
+  
+  <!-- Fonts Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS (Mapas Open Source Gratis) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+  <!-- Style CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header / Navbar -->
+    <header class="navbar">
+      <div class="brand">
+        <span class="brand-logo">🚗💨</span>
+        <div class="brand-text">
+          <h1>AndaYa</h1>
+          <p class="slogan">Pide. Sube. AndaYa.</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-transparent">0% Comisión Chofer</span>
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span class="status-text">Backend Conectado</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Map Container -->
+    <div id="map" class="map-container"></div>
+
+    <!-- Floating Glass Panel (Passenger Card) -->
+    <div class="glass-panel" id="booking-panel">
+      <!-- Step 1: Input Locations -->
+      <div class="panel-step active" id="step-inputs">
+        <h2 class="panel-title">¿A dónde vamos hoy?</h2>
+        
+        <div class="location-inputs">
+          <div class="input-group">
+            <span class="input-icon origin-icon">📍</span>
+            <div class="input-wrapper">
+              <label for="input-origin">Punto de Origen</label>
+              <input type="text" id="input-origin" placeholder="Ingresa tu ubicación actual..." value="Santiago Centro, Chile">
+            </div>
+            <button class="btn-location-picker" id="btn-pick-origin" title="Usar mi ubicación GPS">🎯</button>
+          </div>
+
+          <div class="input-connector"></div>
+
+          <div class="input-group">
+            <span class="input-icon dest-icon">🏁</span>
+            <div class="input-wrapper">
+              <label for="input-dest">Destino</label>
+              <input type="text" id="input-dest" placeholder="¿A dónde quieres ir?" value="Providencia, Santiago">
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Location Chips -->
+        <div class="quick-chips">
+          <span class="chip-label">Sugeridos:</span>
+          <button class="chip" data-origin="-33.4489,-70.6693" data-dest="-33.4263,-70.6126" data-name-dest="Providencia">🏙️ Providencia</button>
+          <button class="chip" data-origin="-33.4489,-70.6693" data-dest="-33.3907,-70.5724" data-name-dest="Las Condes">🏢 Las Condes</button>
+          <button class="chip" data-origin="-33.4489,-70.6693" data-dest="-33.3930,-70.7858" data-name-dest="Aeropuerto SCL">✈️ Aeropuerto</button>
+        </div>
+
+        <button class="btn-primary" id="btn-estimate">
+          <span>Calcular Tarifa Transparente</span>
+          <span class="btn-arrow">→</span>
+        </button>
+      </div>
+
+      <!-- Step 2: Fare Estimation Breakdown -->
+      <div class="panel-step" id="step-fare">
+        <div class="step-header">
+          <button class="btn-back" id="btn-back-step1">← Volver</button>
+          <h3 class="panel-subtitle">Cotización Transparente</h3>
+        </div>
+
+        <div class="route-summary">
+          <div class="route-point">
+            <span class="dot origin-dot"></span>
+            <span id="summary-origin">Santiago Centro</span>
+          </div>
+          <div class="route-line"></div>
+          <div class="route-point">
+            <span class="dot dest-dot"></span>
+            <span id="summary-dest">Providencia</span>
+          </div>
+        </div>
+
+        <!-- Fare Card -->
+        <div class="fare-card">
+          <div class="fare-main">
+            <div class="fare-amount-wrapper">
+              <span class="currency">$</span>
+              <span class="amount" id="fare-amount">4.200</span>
+              <span class="clp">CLP</span>
+            </div>
+            <div class="fare-savings-tag">
+              ⚡ ~20% más barato que Uber/DiDi
+            </div>
+          </div>
+
+          <div class="fare-details">
+            <div class="detail-item">
+              <span class="label">Distancia estimada</span>
+              <span class="value" id="fare-distance">6.2 km</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Tiempo estimado</span>
+              <span class="value" id="fare-time">14 min</span>
+            </div>
+            <div class="detail-item highlight">
+              <span class="label">Comisión de App</span>
+              <span class="value badge-zero">0% (100% chofer)</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-primary btn-success" id="btn-request-trip">
+          <span>Pedir AndaYa Ahora</span>
+          <span class="btn-pulse">⚡</span>
+        </button>
+      </div>
+
+      <!-- Step 3: Searching & Trip Active State -->
+      <div class="panel-step" id="step-active-trip">
+        <div class="searching-header">
+          <div class="radar-spinner">
+            <div class="pulse-ring"></div>
+            <span class="radar-emoji">🚗</span>
+          </div>
+          <div class="searching-text">
+            <h3 id="trip-status-title">Buscando conductores cercanos...</h3>
+            <p id="trip-status-sub">Conectando con choferes sin comisión en tu zona</p>
+          </div>
+        </div>
+
+        <!-- Driver Info (Populates when matched) -->
+        <div class="driver-card hidden" id="driver-card">
+          <div class="driver-profile">
+            <div class="driver-avatar">👨‍✈️</div>
+            <div class="driver-info">
+              <h4 id="driver-name">Carlos Muñoz</h4>
+              <p id="driver-vehicle">Toyota Yaris 2022 • <strong id="driver-plate">AB-CD-12</strong></p>
+              <div class="driver-rating">
+                <span>⭐ 4.9</span>
+                <span class="trips-count">(1,240 viajes)</span>
+              </div>
+            </div>
+          </div>
+          <div class="driver-eta-badge">
+            <span class="eta-time" id="driver-eta">3 min</span>
+            <span class="eta-label">Tiempo de llegada</span>
+          </div>
+        </div>
+
+        <div class="trip-actions">
+          <button class="btn-secondary" id="btn-cancel-trip">Cancelar Viaje</button>
+          <button class="btn-action hidden" id="btn-call-driver">📞 Llamar Conductor</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <!-- Socket.io Client -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <!-- App JS -->
+  <script src="app.js"></script>
+</body>
+</html>

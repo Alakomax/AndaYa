@@ -4,6 +4,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 
+const path = require('path');
 const tripRoutes = require('./routes/tripRoutes');
 const tripSocketHandler = require('./sockets/tripSocketHandler');
 
@@ -15,6 +16,9 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || '*'
 }));
 app.use(express.json());
+
+// Servir la App Pasajero de AndaYa de forma estática
+app.use(express.static(path.join(__dirname, '../../passenger-app')));
 
 // Servidor de WebSockets (Socket.io)
 const io = new Server(server, {
