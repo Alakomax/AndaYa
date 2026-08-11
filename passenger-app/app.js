@@ -146,7 +146,7 @@ function renderDriverSimulators() {
     [-0.006, -0.004]
   ];
 
-  simulatedOffsets.forEach((offset, idx) => {
+  simulatedOffsets.forEach((offset) => {
     const dLat = state.origin.lat + offset[0];
     const dLng = state.origin.lng + offset[1];
     const marker = L.marker([dLat, dLng], { icon: driverIcon }).addTo(state.map);
@@ -209,8 +209,9 @@ async function fetchFareEstimate() {
   document.getElementById('summary-dest').textContent = destText || state.destination.name;
 
   try {
-    // Intentar consultar endpoint REST del Backend de AndaYa
-    const response = await fetch('http://localhost:3000/api/v1/trips/estimate', {
+    // URL relativa dinámica: funciona tanto en localhost como desde IP local en celular
+    const apiBase = `${window.location.protocol}//${window.location.host}`;
+    const response = await fetch(`${apiBase}/api/v1/trips/estimate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -230,11 +231,10 @@ async function fetchFareEstimate() {
       throw new Error('Fallback local');
     }
   } catch (err) {
-    // Cálculo de respaldo transparente (Sin comisión)
-    const rawKm = 6.2;
-    state.distanceKm = rawKm;
-    state.durationMinutes = 14;
-    state.estimatedFare = Math.max(1500, Math.ceil((500 + rawKm * 180 + 14 * 60) / 100) * 100);
+    // Fallback local: calcular tarifa sin red usando las coordenadas del estado
+    const rawKm = state.distanceKm || 6.2;
+    const rawMin = state.durationMinutes || 14;
+    state.estimatedFare = Math.max(1500, Math.ceil((500 + rawKm * 180 + rawMin * 60) / 100) * 100);
   }
 
   // Renderizar valores en la Card

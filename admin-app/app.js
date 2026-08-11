@@ -24,16 +24,16 @@ function initAdminMap() {
     maxZoom: 19
   }).addTo(adminMap);
 
-  // Simular 10 marcadores de choferes activos distribuidos en Santiago
+  // Posiciones simuladas de choferes activos en Santiago (sin duplicados)
   const driverPositions = [
-    [-33.4489, -70.6693],
-    [-33.4263, -70.6126],
-    [-33.3907, -70.5724],
-    [-33.4560, -70.6480],
-    [-33.4180, -70.6010],
-    [-33.4350, -70.6520],
-    [-33.4700, -70.6800],
-    [-33.3800, -70.5500]
+    [-33.4263, -70.6126],  // Providencia
+    [-33.3907, -70.5724],  // Las Condes
+    [-33.4560, -70.6480],  // Barrio Brasil
+    [-33.4180, -70.6010],  // Ñuñoa
+    [-33.4350, -70.6520],  // San Borja
+    [-33.4700, -70.6800],  // San Miguel
+    [-33.3800, -70.5500],  // La Reina
+    [-33.4489, -70.6693]   // Santiago Centro / Plaza de Armas
   ];
 
   const driverIcon = L.divIcon({
@@ -52,7 +52,7 @@ function initAdminMap() {
  */
 function setupSidebarNavigation() {
   document.querySelectorAll('.menu-item').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', () => {
       const targetTab = btn.getAttribute('data-tab');
 
       // Alternar clases del menú

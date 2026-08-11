@@ -40,10 +40,11 @@ class FareService {
         estimatedFare
       };
     } catch (error) {
-      console.error('Error calculando ruta OSRM:', error.message);
-      // Fallback a cálculo de distancia Haversine si el servidor OSRM no responde
+      // Fallback Haversine si el servidor OSRM no responde
+      // CORRECCIÓN: se usaban valores hardcodeados (6.2km/14min) en lugar de calcular con las coords reales
+      console.error('Error calculando ruta OSRM (usando Haversine como fallback):', error.message);
       const distanceKm = this.haversineDistance(originLat, originLng, destLat, destLng);
-      const durationMinutes = Math.ceil(distanceKm * 2.5); // Estimación 2.5 min/km
+      const durationMinutes = Math.ceil(distanceKm * 2.5); // Estimación 2.5 min/km en ciudad
       const estimatedFare = this.calculateFare(distanceKm, durationMinutes);
 
       return {

@@ -9,10 +9,10 @@ const driverState = {
   vehiclePlate: 'AB-CD-12',
   currentLat: -33.4489,
   currentLng: -70.6693,
-  currentTripPhase: 0, // 0: Waiting, 1: Arrived Origin, 2: In Trip, 3: Completed
+  currentTripPhase: 0, // 0: Waiting, 1: En camino a origen, 2: A bordo, 3: En destino
   todayEarnings: 38500,
   countdownTimer: null,
-  countdownSeconds: 15,
+  countdownSeconds: 15, // valor de reset; el conteo real se establece en triggerIncomingOffer
   map: null,
   driverMarker: null,
   socket: null
@@ -176,13 +176,21 @@ function updateTripPhaseUI() {
     destText.textContent = 'Cobro al Pasajero: $4.200 CLP (100% tuyo)';
     actionBtn.textContent = 'Finalizar Viaje y Cobrar $4.200 CLP';
   } else if (driverState.currentTripPhase >= 4) {
-    // Viaje completado -> Sumar ganancias
     driverState.todayEarnings += 4200;
-    document.querySelector('.earning-box .amount').childNodes[0].nodeValue = `$${driverState.todayEarnings.toLocaleString('es-CL')} `;
-    
-    alert('🎉 ¡Viaje Finalizado! $4.200 CLP abonados 100% a tu saldo neto.');
+    // Actualizar widget de ganancias sin alert() nativo
+    const earningsNode = document.querySelector('.earning-box .amount');
+    if (earningsNode) {
+      earningsNode.childNodes[0].nodeValue = `$${driverState.todayEarnings.toLocaleString('es-CL')} `;
+    }
+    // Mostrar banner de confirmación en el panel en lugar de un alert bloqueante
+    const banner = document.getElementById('trip-phase-banner');
+    banner.style.background = 'rgba(16,185,129,0.25)';
+    banner.style.color = '#34d399';
+    banner.textContent = '🎉 ¡Viaje Finalizado! $4.200 CLP abonados al 100% en tu saldo.';
     driverState.currentTripPhase = 0;
-    switchDriverState('state-waiting');
+    setTimeout(() => {
+      switchDriverState('state-waiting');
+    }, 2500);
   }
 }
 

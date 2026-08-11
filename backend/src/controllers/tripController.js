@@ -6,7 +6,7 @@ const fareService = require('../services/fareService');
 class TripController {
   /**
    * POST /api/v1/trips/estimate
-   * Cotiza la tarifa estimada transparente antes de pedir el viaje
+   * Cotiza la tarifa estimada transparente antes de solicitar el viaje.
    */
   async estimateTrip(req, res) {
     try {
@@ -33,9 +33,10 @@ class TripController {
           distanceKm: routeInfo.distanceKm,
           durationMinutes: routeInfo.durationMinutes,
           breakdown: {
-            baseFare: parseInt(process.env.BASE_FARE || '500'),
-            commissionFee: 0, // 0% Comisión por viaje en AndaYa
-            driverEarningsPercentage: 100 // El chofer se queda con el 100% de la tarifa
+            // Leer desde fareService para mantener una única fuente de verdad
+            baseFare: fareService.baseFare,
+            commissionFee: 0,          // 0% Comisión por viaje en AndaYa
+            driverEarningsPercentage: 100
           }
         }
       });
