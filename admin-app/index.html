@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AndaYa Admin - Panel de Control & Ley EAT</title>
+  <meta name="description" content="Panel de administración global para AndaYa: Gestión de flotas, aprobación Ley EAT y configuración de suscripciones.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+  <!-- Style CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="admin-app">
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-icon">🛡️</span>
+        <div>
+          <h1>AndaYa Admin</h1>
+          <span class="version">Backoffice v1.0 • Ley EAT</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-menu">
+        <button class="menu-item active" data-tab="tab-fleet">
+          <span class="icon">🗺️</span> Mapa de Flota en Vivo
+        </button>
+        <button class="menu-item" data-tab="tab-verification">
+          <span class="icon">📋</span> Verificación Ley EAT <span class="badge-count" id="pending-count">3</span>
+        </button>
+        <button class="menu-item" data-tab="tab-trips">
+          <span class="icon">🚗</span> Monitor de Viajes
+        </button>
+        <button class="menu-item" data-tab="tab-settings">
+          <span class="icon">⚙️</span> Tarifas y Suscripciones
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini">
+          <span class="avatar">👨‍💼</span>
+          <div>
+            <span class="name">Admin Principal</span>
+            <span class="role">Supervisión Chile</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <!-- Top Metrics Dashboard Bar -->
+      <header class="metrics-bar">
+        <div class="metric-card">
+          <span class="metric-label">Choferes Conectados</span>
+          <div class="metric-value">
+            <span class="val" id="metric-online-drivers">142</span>
+            <span class="trend positive">🟢 En línea</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-label">Viajes Activos</span>
+          <div class="metric-value">
+            <span class="val" id="metric-active-trips">34</span>
+            <span class="trend">⚡ En curso</span>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <span class="metric-label">Ingresos por Suscripción (Mes)</span>
+          <div class="metric-value">
+            <span class="val">$4.260.000</span>
+            <span class="clp">CLP</span>
+          </div>
+        </div>
+
+        <div class="metric-card highlight">
+          <span class="metric-label">Comisión Cobrada por Viaje</span>
+          <div class="metric-value">
+            <span class="val zero-text">0%</span>
+            <span class="trend positive">✨ Modelo Justo</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- TAB 1: Mapa de Flota en Vivo -->
+      <section class="admin-tab active" id="tab-fleet">
+        <div class="map-view-header">
+          <h2>Supervisión de Flota Geográfica</h2>
+          <div class="map-actions">
+            <button class="btn-filter active">Todos (142)</button>
+            <button class="btn-filter">En Viaje (34)</button>
+            <button class="btn-filter">Disponibles (108)</button>
+          </div>
+        </div>
+        <div id="admin-map" class="admin-map-container"></div>
+      </section>
+
+      <!-- TAB 2: Verificación de Conductores Ley EAT 21.553 -->
+      <section class="admin-tab" id="tab-verification">
+        <div class="tab-header">
+          <h2>Solicitudes de Conductores (Requisitos Ley EAT)</h2>
+          <p>Revisión de licencias A-1/A-2, certificados de antecedentes y padrón del vehículo.</p>
+        </div>
+
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Conductor</th>
+                <th>Vehículo / Patente</th>
+                <th>Licencia</th>
+                <th>Antecedentes</th>
+                <th>Estado EAT</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="verification-tbody">
+              <tr>
+                <td>
+                  <div class="user-table-cell">
+                    <span class="avatar">👨‍✈️</span>
+                    <div>
+                      <strong>Esteban Morales</strong>
+                      <small>esteban.m@gmail.com</small>
+                    </div>
+                  </div>
+                </td>
+                <td>Hyundai Accent 2021<br><span class="badge-plate">GK-90-12</span></td>
+                <td><span class="badge-licence">Clase A-2</span></td>
+                <td><span class="badge-status clean">Sin Antecedentes</span></td>
+                <td><span class="badge-status pending">Pendiente</span></td>
+                <td>
+                  <div class="table-actions">
+                    <button class="btn-approve" onclick="approveDriver(this, 'Esteban Morales')">Aprobar EAT</button>
+                    <button class="btn-reject">Rechazar</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="user-table-cell">
+                    <span class="avatar">👨‍✈️</span>
+                    <div>
+                      <strong>Rodrigo Fuentes</strong>
+                      <small>rodrigo.f@outlook.com</small>
+                    </div>
+                  </div>
+                </td>
+                <td>Nissan Versa 2022<br><span class="badge-plate">HY-44-88</span></td>
+                <td><span class="badge-licence">Clase A-1</span></td>
+                <td><span class="badge-status clean">Sin Antecedentes</span></td>
+                <td><span class="badge-status pending">Pendiente</span></td>
+                <td>
+                  <div class="table-actions">
+                    <button class="btn-approve" onclick="approveDriver(this, 'Rodrigo Fuentes')">Aprobar EAT</button>
+                    <button class="btn-reject">Rechazar</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 3: Monitor de Viajes -->
+      <section class="admin-tab" id="tab-trips">
+        <div class="tab-header">
+          <h2>Monitor de Viajes en Tiempo Real</h2>
+        </div>
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID Viaje</th>
+                <th>Pasajero</th>
+                <th>Conductor</th>
+                <th>Ruta (Origen -> Destino)</th>
+                <th>Tarifa Transparente</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>#TRIP-9041</code></td>
+                <td>Valentina R.</td>
+                <td>Carlos Muñoz (AB-CD-12)</td>
+                <td>Santiago Centro $\rightarrow$ Providencia</td>
+                <td><strong>$4.200 CLP</strong> (100% chofer)</td>
+                <td><span class="badge-status active-trip">EN CURSO</span></td>
+              </tr>
+              <tr>
+                <td><code>#TRIP-9040</code></td>
+                <td>Matías L.</td>
+                <td>Gonzalo Perez (KX-12-90)</td>
+                <td>Las Condes $\rightarrow$ Vitacura</td>
+                <td><strong>$5.800 CLP</strong> (100% chofer)</td>
+                <td><span class="badge-status completed">COMPLETADO</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 4: Tarifas y Configuración de Suscripción -->
+      <section class="admin-tab" id="tab-settings">
+        <div class="tab-header">
+          <h2>Configuración de Modelo de Negocio (Suscripciones)</h2>
+        </div>
+
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3>Planes de Suscripción para Choferes</h3>
+            <div class="setting-item">
+              <label>Suscripción Mensual (CLP)</label>
+              <input type="number" value="30000" id="sub-monthly">
+            </div>
+            <div class="setting-item">
+              <label>Suscripción Semanal (CLP)</label>
+              <input type="number" value="8500" id="sub-weekly">
+            </div>
+            <div class="setting-item">
+              <label>Pase Diario (CLP)</label>
+              <input type="number" value="1500" id="sub-daily">
+            </div>
+            <button class="btn-save" onclick="alert('✅ Configuración de suscripciones guardada')">Guardar Planes</button>
+          </div>
+
+          <div class="settings-card">
+            <h3>Reglas de Tarifa Transparente (Pasajero)</h3>
+            <div class="setting-item">
+              <label>Bajada de Bandera Base ($ CLP)</label>
+              <input type="number" value="500" id="rate-base">
+            </div>
+            <div class="setting-item">
+              <label>Tarifa por Kilómetro ($ CLP/km)</label>
+              <input type="number" value="180" id="rate-km">
+            </div>
+            <div class="setting-item">
+              <label>Tarifa por Minuto ($ CLP/min)</label>
+              <input type="number" value="60" id="rate-min">
+            </div>
+            <button class="btn-save" onclick="alert('✅ Parámetros de tarifa guardados')">Guardar Reglas de Tarifa</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <!-- App JS -->
+  <script src="app.js"></script>
+</body>
+</html>

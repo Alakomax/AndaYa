@@ -23,6 +23,9 @@ app.use(express.static(path.join(__dirname, '../../passenger-app')));
 // Servir la App Conductor de AndaYa de forma estática (Ruta /driver)
 app.use('/driver', express.static(path.join(__dirname, '../../driver-app')));
 
+// Servir la App Admin Backoffice de AndaYa de forma estática (Ruta /admin)
+app.use('/admin', express.static(path.join(__dirname, '../../admin-app')));
+
 // Servidor de WebSockets (Socket.io)
 const io = new Server(server, {
   cors: {
