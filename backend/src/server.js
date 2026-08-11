@@ -45,10 +45,13 @@ app.get('/health', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+const HOST = '0.0.0.0';
+
+server.listen(PORT, HOST, () => {
   console.log(`=================================`);
   console.log(`🚀 AndaYa Backend Core iniciado`);
-  console.log(`📍 Puerto: ${PORT}`);
+  console.log(`📍 Servidor en vivo: http://localhost:${PORT}`);
+  console.log(`📱 Acceso Celular (Wi-Fi): http://192.168.100.140:${PORT}`);
   console.log(`🚗 Eslogan: Pide. Sube. AndaYa.`);
   console.log(`=================================`);
 });
