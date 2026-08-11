@@ -2,184 +2,224 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AndaYa - Pide. Sube. AndaYa.</title>
-  <meta name="description" content="AndaYa es la app latinoamericana que conecta pasajeros y conductores para moverse de forma rápida, segura y transparente.">
-  
-  <!-- Fonts Google -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AndaYa — Pide. Sube. AndaYa.</title>
+  <meta name="description" content="AndaYa: la app latinoamericana que conecta pasajeros y conductores de forma rápida, segura y sin comisiones abusivas.">
+  <meta name="theme-color" content="#050810">
+
+  <!-- Google Fonts: Outfit + Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Leaflet CSS (Mapas Open Source Gratis) -->
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 
-  <!-- Style CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app">
-    <!-- Header / Navbar -->
-    <header class="navbar">
-      <div class="brand">
-        <span class="brand-logo">🚗💨</span>
-        <div class="brand-text">
-          <h1>AndaYa</h1>
-          <p class="slogan">Pide. Sube. AndaYa.</p>
-        </div>
+
+<div id="app">
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar" id="navbar">
+    <div class="brand">
+      <div class="brand-emblem">
+        <span class="brand-icon">🚗</span>
+        <div class="brand-glow"></div>
       </div>
-      <div class="header-badges">
-        <span class="badge badge-transparent">0% Comisión Chofer</span>
-        <div class="status-indicator">
-          <span class="status-dot"></span>
-          <span class="status-text">Backend Conectado</span>
-        </div>
-      </div>
-    </header>
-
-    <!-- Map Container -->
-    <div id="map" class="map-container"></div>
-
-    <!-- Floating Glass Panel (Passenger Card) -->
-    <div class="glass-panel" id="booking-panel">
-      <!-- Step 1: Input Locations -->
-      <div class="panel-step active" id="step-inputs">
-        <h2 class="panel-title">¿A dónde vamos hoy?</h2>
-        
-        <div class="location-inputs">
-          <div class="input-group">
-            <span class="input-icon origin-icon">📍</span>
-            <div class="input-wrapper">
-              <label for="input-origin">Punto de Origen</label>
-              <input type="text" id="input-origin" placeholder="Ingresa tu ubicación actual..." value="Santiago Centro, Chile">
-            </div>
-            <button class="btn-location-picker" id="btn-pick-origin" title="Usar mi ubicación GPS">🎯</button>
-          </div>
-
-          <div class="input-connector"></div>
-
-          <div class="input-group">
-            <span class="input-icon dest-icon">🏁</span>
-            <div class="input-wrapper">
-              <label for="input-dest">Destino</label>
-              <input type="text" id="input-dest" placeholder="¿A dónde quieres ir?" value="Providencia, Santiago">
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Location Chips -->
-        <div class="quick-chips">
-          <span class="chip-label">Sugeridos:</span>
-          <button class="chip" data-origin="-33.4489,-70.6693" data-dest="-33.4263,-70.6126" data-name-dest="Providencia">🏙️ Providencia</button>
-          <button class="chip" data-origin="-33.4489,-70.6693" data-dest="-33.3907,-70.5724" data-name-dest="Las Condes">🏢 Las Condes</button>
-          <button class="chip" data-origin="-33.4489,-70.6693" data-dest="-33.3930,-70.7858" data-name-dest="Aeropuerto SCL">✈️ Aeropuerto</button>
-        </div>
-
-        <button class="btn-primary" id="btn-estimate">
-          <span>Calcular Tarifa Transparente</span>
-          <span class="btn-arrow">→</span>
-        </button>
-      </div>
-
-      <!-- Step 2: Fare Estimation Breakdown -->
-      <div class="panel-step" id="step-fare">
-        <div class="step-header">
-          <button class="btn-back" id="btn-back-step1">← Volver</button>
-          <h3 class="panel-subtitle">Cotización Transparente</h3>
-        </div>
-
-        <div class="route-summary">
-          <div class="route-point">
-            <span class="dot origin-dot"></span>
-            <span id="summary-origin">Santiago Centro</span>
-          </div>
-          <div class="route-line"></div>
-          <div class="route-point">
-            <span class="dot dest-dot"></span>
-            <span id="summary-dest">Providencia</span>
-          </div>
-        </div>
-
-        <!-- Fare Card -->
-        <div class="fare-card">
-          <div class="fare-main">
-            <div class="fare-amount-wrapper">
-              <span class="currency">$</span>
-              <span class="amount" id="fare-amount">4.200</span>
-              <span class="clp">CLP</span>
-            </div>
-            <div class="fare-savings-tag">
-              ⚡ ~20% más barato que Uber/DiDi
-            </div>
-          </div>
-
-          <div class="fare-details">
-            <div class="detail-item">
-              <span class="label">Distancia estimada</span>
-              <span class="value" id="fare-distance">6.2 km</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">Tiempo estimado</span>
-              <span class="value" id="fare-time">14 min</span>
-            </div>
-            <div class="detail-item highlight">
-              <span class="label">Comisión de App</span>
-              <span class="value badge-zero">0% (100% chofer)</span>
-            </div>
-          </div>
-        </div>
-
-        <button class="btn-primary btn-success" id="btn-request-trip">
-          <span>Pedir AndaYa Ahora</span>
-          <span class="btn-pulse">⚡</span>
-        </button>
-      </div>
-
-      <!-- Step 3: Searching & Trip Active State -->
-      <div class="panel-step" id="step-active-trip">
-        <div class="searching-header">
-          <div class="radar-spinner">
-            <div class="pulse-ring"></div>
-            <span class="radar-emoji">🚗</span>
-          </div>
-          <div class="searching-text">
-            <h3 id="trip-status-title">Buscando conductores cercanos...</h3>
-            <p id="trip-status-sub">Conectando con choferes sin comisión en tu zona</p>
-          </div>
-        </div>
-
-        <!-- Driver Info (Populates when matched) -->
-        <div class="driver-card hidden" id="driver-card">
-          <div class="driver-profile">
-            <div class="driver-avatar">👨‍✈️</div>
-            <div class="driver-info">
-              <h4 id="driver-name">Carlos Muñoz</h4>
-              <p id="driver-vehicle">Toyota Yaris 2022 • <strong id="driver-plate">AB-CD-12</strong></p>
-              <div class="driver-rating">
-                <span>⭐ 4.9</span>
-                <span class="trips-count">(1,240 viajes)</span>
-              </div>
-            </div>
-          </div>
-          <div class="driver-eta-badge">
-            <span class="eta-time" id="driver-eta">3 min</span>
-            <span class="eta-label">Tiempo de llegada</span>
-          </div>
-        </div>
-
-        <div class="trip-actions">
-          <button class="btn-secondary" id="btn-cancel-trip">Cancelar Viaje</button>
-          <button class="btn-action hidden" id="btn-call-driver">📞 Llamar Conductor</button>
-        </div>
+      <div class="brand-copy">
+        <h1 class="brand-name">AndaYa</h1>
+        <p class="brand-slogan">Pide. Sube. AndaYa.</p>
       </div>
     </div>
-  </div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <!-- Socket.io Client -->
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <!-- App JS -->
-  <script src="app.js"></script>
+    <div class="nav-right">
+      <div class="zero-badge">
+        <span class="zero-icon">✦</span>
+        <span>0% Comisión</span>
+      </div>
+      <div class="connection-pill" id="connection-pill">
+        <span class="conn-dot" id="conn-dot"></span>
+        <span class="conn-label" id="conn-label">Conectando...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAPA ===== -->
+  <div id="map" class="map-layer"></div>
+
+  <!-- ===== PANEL FLOTANTE ===== -->
+  <div class="glass-panel" id="glass-panel">
+
+    <!-- ─── PASO 1: Inputs de Ruta ─── -->
+    <div class="panel-step active" id="step-inputs">
+      <div class="step-intro">
+        <h2 class="panel-heading">¿A dónde <span class="accent-text">vamos?</span></h2>
+      </div>
+
+      <div class="route-inputs">
+        <!-- Conector visual entre inputs -->
+        <div class="route-connector">
+          <span class="connector-dot origin-dot"></span>
+          <div class="connector-line"></div>
+          <span class="connector-dot dest-dot"></span>
+        </div>
+
+        <div class="inputs-col">
+          <div class="input-field" id="field-origin">
+            <div class="field-label">ORIGEN</div>
+            <input type="text" id="input-origin"
+              placeholder="Tu ubicación actual"
+              value="Plaza de Armas, Santiago Centro">
+            <button class="btn-gps" id="btn-pick-origin" title="Usar GPS">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/><circle cx="12" cy="12" r="9" stroke-dasharray="3 2"/></svg>
+            </button>
+          </div>
+
+          <div class="input-field" id="field-dest">
+            <div class="field-label">DESTINO</div>
+            <input type="text" id="input-dest" placeholder="¿A dónde quieres ir?" value="Providencia, Santiago">
+          </div>
+        </div>
+      </div>
+
+      <!-- Chips de destino rápido -->
+      <div class="quick-destinations">
+        <button class="dest-chip" id="chip-providencia" data-name-dest="Providencia">
+          <span class="chip-icon">🏙️</span> Providencia
+        </button>
+        <button class="dest-chip" id="chip-lascondes" data-name-dest="Las Condes">
+          <span class="chip-icon">🏢</span> Las Condes
+        </button>
+        <button class="dest-chip" id="chip-aeropuerto" data-name-dest="Aeropuerto SCL">
+          <span class="chip-icon">✈️</span> Aeropuerto
+        </button>
+      </div>
+
+      <button class="cta-button" id="btn-estimate">
+        <span class="cta-text">Calcular Tarifa</span>
+        <span class="cta-arrow">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
+      </button>
+    </div>
+
+    <!-- ─── PASO 2: Tarifa ─── -->
+    <div class="panel-step" id="step-fare">
+      <div class="step-nav">
+        <button class="btn-back-nav" id="btn-back-step1">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <h3 class="step-title">Cotización Transparente</h3>
+      </div>
+
+      <!-- Resumen de ruta -->
+      <div class="route-summary">
+        <div class="route-point">
+          <span class="rp-dot origin-rp"></span>
+          <p id="summary-origin" class="rp-text">Santiago Centro</p>
+        </div>
+        <div class="rp-connector"></div>
+        <div class="route-point">
+          <span class="rp-dot dest-rp"></span>
+          <p id="summary-dest" class="rp-text">Providencia</p>
+        </div>
+      </div>
+
+      <!-- Tarjeta de Tarifa -->
+      <div class="fare-card">
+        <div class="fare-header">
+          <div class="fare-amount-block">
+            <span class="fare-currency">$</span>
+            <span class="fare-amount" id="fare-amount">4.200</span>
+            <span class="fare-unit">CLP</span>
+          </div>
+          <div class="fare-tags">
+            <div class="tag-savings">⚡ ~20% más barato que Uber</div>
+            <div class="tag-zero">0% comisión al chofer</div>
+          </div>
+        </div>
+
+        <div class="fare-breakdown">
+          <div class="breakdown-row">
+            <span class="br-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M12 3a9 9 0 010 18"/></svg>
+              Distancia
+            </span>
+            <span class="br-value" id="fare-distance">6.2 km</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="br-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              Tiempo estimado
+            </span>
+            <span class="br-value" id="fare-time">14 min</span>
+          </div>
+          <div class="breakdown-row highlight-row">
+            <span class="br-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              Ganancia del chofer
+            </span>
+            <span class="br-value green-val">100% — Sin descuentos</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="cta-button cta-green" id="btn-request-trip">
+        <span class="cta-text">Pedir mi AndaYa</span>
+        <span class="cta-icon">⚡</span>
+      </button>
+    </div>
+
+    <!-- ─── PASO 3: Búsqueda y Viaje Activo ─── -->
+    <div class="panel-step" id="step-active-trip">
+      <!-- Estado: Buscando -->
+      <div class="searching-state" id="searching-view">
+        <div class="radar-wrapper">
+          <div class="radar-ring r1"></div>
+          <div class="radar-ring r2"></div>
+          <div class="radar-ring r3"></div>
+          <div class="radar-center">🚗</div>
+        </div>
+        <div class="searching-copy">
+          <h3 id="trip-status-title">Buscando conductores...</h3>
+          <p id="trip-status-sub">Conectando choferes sin comisión en tu zona</p>
+        </div>
+      </div>
+
+      <!-- Estado: Conductor Asignado (oculto hasta match) -->
+      <div class="driver-matched-card hidden" id="driver-matched-card">
+        <div class="match-badge">✓ Conductor Asignado</div>
+        <div class="driver-row">
+          <div class="driver-avatar-wrap">
+            <span class="driver-avatar">👨‍✈️</span>
+            <span class="driver-star-badge">⭐ 4.9</span>
+          </div>
+          <div class="driver-details">
+            <h4 id="driver-name">Carlos Muñoz</h4>
+            <p id="driver-vehicle">Toyota Yaris 2022</p>
+            <div class="plate-badge" id="driver-plate">AB-CD-12</div>
+          </div>
+          <div class="driver-eta-block">
+            <span class="eta-value" id="driver-eta">3 min</span>
+            <span class="eta-caption">Llegada</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="trip-controls">
+        <button class="btn-cancel-trip" id="btn-cancel-trip">Cancelar</button>
+        <button class="btn-call-driver hidden" id="btn-call-driver">📞 Llamar</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
