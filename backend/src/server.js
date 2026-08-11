@@ -17,8 +17,11 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Servir la App Pasajero de AndaYa de forma estática
+// Servir la App Pasajero de AndaYa de forma estática (Raíz /)
 app.use(express.static(path.join(__dirname, '../../passenger-app')));
+
+// Servir la App Conductor de AndaYa de forma estática (Ruta /driver)
+app.use('/driver', express.static(path.join(__dirname, '../../driver-app')));
 
 // Servidor de WebSockets (Socket.io)
 const io = new Server(server, {
