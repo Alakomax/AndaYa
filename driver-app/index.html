@@ -2,155 +2,171 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AndaYa Driver - Conductor</title>
-  <meta name="description" content="Modo Conductor para la app AndaYa: Maneja sin comisiones, conserva el 100% de tus tarifas.">
-  
-  <!-- Google Fonts -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AndaYa Conductor — Ganancias 100% Tuyas</title>
+  <meta name="description" content="Modo Conductor AndaYa: Conéctate, acepta carreras cercanas y conserva el 100% de la tarifa sin comisiones.">
+  <meta name="theme-color" content="#050810">
+
+  <!-- Google Fonts: Outfit + Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 
-  <!-- Style CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="driver-app">
-    <!-- Navbar Conductor -->
+
+    <!-- ===== NAVBAR CONDUCTOR ===== -->
     <header class="driver-navbar">
-      <div class="driver-profile-header">
-        <div class="avatar">👨‍✈️</div>
-        <div class="profile-meta">
-          <h2>Carlos Muñoz</h2>
-          <span class="vehicle-tag">Toyota Yaris • <strong>AB-CD-12</strong></span>
+      <div class="driver-profile">
+        <div class="avatar-wrap">
+          <span class="avatar">👨‍✈️</span>
+          <span class="star-pill">⭐ 4.9</span>
+        </div>
+        <div class="profile-info">
+          <h2 class="driver-name">Carlos Muñoz</h2>
+          <div class="vehicle-line">
+            <span>Toyota Yaris</span>
+            <span class="plate-badge">AB-CD-12</span>
+          </div>
         </div>
       </div>
 
-      <!-- Conmutador Online / Offline -->
-      <div class="online-toggle-wrapper">
-        <button class="btn-status-toggle offline" id="btn-toggle-online">
-          <span class="status-indicator-dot"></span>
+      <div class="toggle-wrap">
+        <button class="btn-toggle-online offline" id="btn-toggle-online">
+          <span class="toggle-dot"></span>
           <span id="toggle-label">FUERA DE LÍNEA</span>
         </button>
       </div>
     </header>
 
-    <!-- Map Container -->
-    <div id="driver-map" class="map-container"></div>
+    <!-- ===== MAPA CONDUCTOR ===== -->
+    <div id="driver-map" class="map-layer"></div>
 
-    <!-- Panel Inferior del Conductor -->
+    <!-- ===== PANEL FLOTANTE INFERIOR ===== -->
     <div class="driver-panel">
+
       <!-- Widget de Ganancias Rápidas -->
-      <div class="earnings-widget" id="earnings-widget">
-        <div class="earning-box">
-          <span class="label">Ganado Hoy (100% tuyo)</span>
-          <span class="amount">$38.500 <small>CLP</small></span>
+      <div class="earnings-glass-widget" id="earnings-widget">
+        <div class="earning-item">
+          <span class="earning-label">GANADO HOY</span>
+          <div class="earning-amount-wrap">
+            <span class="earning-val" id="today-earnings">$38.500</span>
+            <span class="earning-cur">CLP</span>
+          </div>
         </div>
+
         <div class="earning-divider"></div>
-        <div class="earning-box">
-          <span class="label">Comisión a App</span>
-          <span class="amount zero-commission">$0 CLP <small>(0%)</small></span>
+
+        <div class="earning-item">
+          <span class="earning-label">COMISIÓN APPLICACIÓN</span>
+          <div class="earning-amount-wrap">
+            <span class="zero-comm-val">$0 CLP</span>
+            <span class="comm-badge">0% Comisión</span>
+          </div>
         </div>
       </div>
 
-      <!-- Tarjeta 1: Estado Esperando Solicitudes -->
+      <!-- ESTADO 1: Esperando Solicitudes -->
       <div class="panel-state active" id="state-waiting">
-        <div class="waiting-card">
-          <div class="pulse-icon">📡</div>
-          <div class="waiting-text">
+        <div class="state-card waiting-card">
+          <div class="pulse-radar">
+            <span class="radar-dot"></span>
+            <span class="pulse-ring"></span>
+          </div>
+          <div class="waiting-copy">
             <h3 id="waiting-title">Estás fuera de línea</h3>
             <p id="waiting-sub">Conéctate para empezar a recibir solicitudes de viajes sin comisión.</p>
           </div>
         </div>
       </div>
 
-      <!-- Tarjeta 2: Oferta Entrante (Incoming Trip Card) -->
+      <!-- ESTADO 2: Solicitud Entrante -->
       <div class="panel-state" id="state-incoming">
-        <div class="incoming-card">
-          <div class="incoming-header">
-            <span class="badge-incoming">⚡ ¡NUEVO VIAJE CERCANO!</span>
-            <div class="countdown-circle" id="countdown-timer">15</div>
+        <div class="state-card incoming-card">
+          <div class="incoming-top">
+            <div class="new-trip-tag">⚡ ¡NUEVA SOLICITUD CERCANA!</div>
+            <div class="timer-bubble" id="countdown-timer">15</div>
           </div>
 
-          <div class="trip-offer-details">
-            <div class="passenger-info">
-              <span class="passenger-avatar">👤</span>
-              <div>
-                <h4>Valentina R.</h4>
-                <span class="passenger-rating">⭐ 4.9 (48 viajes)</span>
-              </div>
+          <div class="passenger-card">
+            <div class="p-avatar">👤</div>
+            <div class="p-meta">
+              <h4>Valentina R.</h4>
+              <span class="p-rating">⭐ 4.9 • 48 viajes realizados</span>
             </div>
-
-            <div class="offer-earnings">
-              <span class="offer-amount">$4.200 <small>CLP</small></span>
-              <span class="offer-net-tag">100% Ganancia Neta</span>
+            <div class="p-fare">
+              <span class="p-amount">$4.200</span>
+              <span class="p-net">100% Tuyo</span>
             </div>
           </div>
 
-          <div class="route-preview">
-            <div class="route-row">
-              <span class="icon origin-icon">📍</span>
-              <div>
-                <label>Recojo (a 1.2 km • 4 min):</label>
+          <div class="route-preview-box">
+            <div class="route-point-row">
+              <span class="r-dot origin-r"></span>
+              <div class="r-text">
+                <span class="r-label">PUNTO DE RECOJO (a 1.2 km • 4 min)</span>
                 <p>Plaza de Armas, Santiago Centro</p>
               </div>
             </div>
-            <div class="route-row">
-              <span class="icon dest-icon">🏁</span>
-              <div>
-                <label>Destino Final:</label>
+            <div class="r-line"></div>
+            <div class="route-point-row">
+              <span class="r-dot dest-r"></span>
+              <div class="r-text">
+                <span class="r-label">DESTINO FINAL</span>
                 <p>Av. Providencia 1450, Providencia</p>
               </div>
             </div>
           </div>
 
-          <div class="offer-actions">
+          <div class="action-buttons">
             <button class="btn-decline" id="btn-decline-trip">Rechazar</button>
             <button class="btn-accept" id="btn-accept-trip">ACEPTAR VIAJE ($4.200 CLP)</button>
           </div>
         </div>
       </div>
 
-      <!-- Tarjeta 3: Viaje en Curso (Navegación & Taxímetro) -->
+      <!-- ESTADO 3: Viaje en Curso / Taxímetro -->
       <div class="panel-state" id="state-in-trip">
-        <div class="in-trip-card">
-          <div class="trip-status-banner" id="trip-phase-banner">
-            En camino al punto de recojo
+        <div class="state-card in-trip-card">
+          <div class="phase-banner" id="trip-phase-banner">
+            🚗 En camino al punto de recojo (Santiago Centro)
           </div>
 
-          <div class="passenger-quick-row">
-            <div class="passenger-meta">
+          <div class="passenger-in-trip">
+            <div class="p-info">
               <h4>Valentina R.</h4>
-              <p id="current-destination-text">Destino: Av. Providencia 1450</p>
+              <p id="current-destination-text">Pasajero esperando en Origen</p>
             </div>
-            <div class="quick-buttons">
-              <button class="btn-call">📞</button>
-              <button class="btn-nav">🗺️ Navegar</button>
-            </div>
-          </div>
-
-          <!-- Taxímetro Digital -->
-          <div class="taximeter-box">
-            <div class="taximeter-value">
-              <span class="label">Tarifa Acordada (0% Comisión)</span>
-              <span class="val">$4.200 CLP</span>
+            <div class="p-actions">
+              <button class="btn-quick-action" title="Llamar al Pasajero">📞</button>
+              <button class="btn-quick-action" title="Abrir GPS">🗺️</button>
             </div>
           </div>
 
-          <button class="btn-trip-action" id="btn-next-phase">
-            Llegué al Origen
+          <div class="taximeter-glass">
+            <span class="tax-label">TARIFA CONVENIDA (0% COMISIÓN)</span>
+            <div class="tax-price">$4.200 <small>CLP</small></div>
+            <span class="tax-sub">El pasajero te pagará el 100% directo</span>
+          </div>
+
+          <button class="btn-phase-action" id="btn-next-phase">
+            Marcar "Llegué al Origen"
           </button>
         </div>
       </div>
+
     </div>
+
   </div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <!-- Socket.io Client -->
+  <!-- Socket.io -->
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <!-- App JS -->
   <script src="app.js"></script>
