@@ -1,6 +1,6 @@
 /**
  * AndaYa Admin — Backoffice Logic v2.0
- * Collapsible Sidebar, Realtime Fleet Supervision & Ley EAT Management
+ * Mini Sidebar (Stripe/Vercel Style), Realtime Fleet Supervision & Ley EAT Management
  */
 
 let adminMap = null;
@@ -63,16 +63,35 @@ function initAdminMap() {
  * 2. Gestión de Menú Colapsable (Desktop & Mobile)
  */
 function setupCollapsibleSidebar() {
-  const sidebar  = document.getElementById('admin-sidebar');
-  const toggleBtn = document.getElementById('btn-toggle-sidebar');
-  const mobileBtn = document.getElementById('btn-mobile-menu');
-  const backdrop  = document.getElementById('sidebar-backdrop');
+  const sidebar        = document.getElementById('admin-sidebar');
+  const toggleBtn      = document.getElementById('btn-toggle-sidebar');
+  const emblemTrigger  = document.getElementById('brand-emblem-trigger');
+  const topbarExpandBtn = document.getElementById('btn-expand-topbar');
+  const mobileBtn      = document.getElementById('btn-mobile-menu');
+  const backdrop       = document.getElementById('sidebar-backdrop');
 
-  // Toggle en Desktop (Colapsar a Iconos / Expandir)
-  toggleBtn.addEventListener('click', () => {
+  function toggleSidebar() {
     sidebar.classList.toggle('collapsed');
     triggerMapResize();
-  });
+  }
+
+  function expandSidebar() {
+    sidebar.classList.remove('collapsed');
+    triggerMapResize();
+  }
+
+  // Triggers para alternar/expandir en Desktop
+  if (toggleBtn) toggleBtn.addEventListener('click', toggleSidebar);
+  if (topbarExpandBtn) topbarExpandBtn.addEventListener('click', expandSidebar);
+  
+  // Al hacer clic en el logo del sidebar cuando está colapsado, expandir
+  if (emblemTrigger) {
+    emblemTrigger.addEventListener('click', () => {
+      if (sidebar.classList.contains('collapsed')) {
+        expandSidebar();
+      }
+    });
+  }
 
   // Toggle en Mobile (Abrir / Cerrar Drawer)
   if (mobileBtn) {
@@ -96,10 +115,9 @@ function setupCollapsibleSidebar() {
  */
 function triggerMapResize() {
   if (!adminMap) return;
-  // Esperar a que la transición CSS termine (300ms)
   setTimeout(() => {
     adminMap.invalidateSize();
-  }, 320);
+  }, 340);
 }
 
 /**
@@ -138,7 +156,7 @@ function setupSidebarNavigation() {
 }
 
 /**
- * 4. Atajos de Teclado (Ctrl+B para colapsar menú)
+ * 4. Atajos de Teclado (Ctrl+B para colapsar/expandir menú)
  */
 function setupKeyboardShortcuts() {
   document.addEventListener('keydown', (e) => {

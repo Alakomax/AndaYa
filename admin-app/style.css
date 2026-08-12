@@ -1,6 +1,6 @@
 /* ============================
    AndaYa Admin — Design System v2.0
-   Dark Premium Glass Backoffice
+   Dark Premium Glass Backoffice (Mini Sidebar)
    ============================ */
 
 /* ── Tokens ── */
@@ -11,7 +11,7 @@
   --navy:           #111827;
 
   --sidebar-expanded: 260px;
-  --sidebar-collapsed: 72px;
+  --sidebar-collapsed: 76px;
 
   --blue-primary:   #2563eb;
   --blue-light:     #3b82f6;
@@ -65,7 +65,7 @@ html, body {
 }
 
 /* ============================
-   SIDEBAR NAVEGACIÓN COLAPSABLE
+   SIDEBAR NAVEGACIÓN (EXPANDIBLE & MINI)
    ============================ */
 .admin-sidebar {
   width: var(--sidebar-expanded);
@@ -79,15 +79,15 @@ html, body {
   justify-content: space-between;
   padding: 16px 14px;
   z-index: 1000;
-  transition: width 0.3s var(--ease-smooth), padding 0.3s var(--ease-smooth);
+  transition: width 0.32s var(--ease-smooth), padding 0.32s var(--ease-smooth);
   flex-shrink: 0;
   position: relative;
 }
 
-/* ── MODO COLAPSADO ── */
+/* ── MODO MINI COLAPSADO (Stripe / Vercel Style) ── */
 .admin-sidebar.collapsed {
   width: var(--sidebar-collapsed);
-  padding: 16px 8px;
+  padding: 16px 10px;
 }
 
 .admin-sidebar.collapsed .brand-text,
@@ -102,20 +102,67 @@ html, body {
 
 .admin-sidebar.collapsed .sidebar-brand {
   justify-content: center;
-  padding-bottom: 12px;
+  width: 100%;
+}
+
+.admin-sidebar.collapsed .brand-emblem {
+  cursor: pointer;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.6);
+}
+
+.admin-sidebar.collapsed .btn-toggle-sidebar {
+  display: none; /* Se oculta en el header del sidebar y se usa el trigger en topbar o emblem */
 }
 
 .admin-sidebar.collapsed .menu-item {
   justify-content: center;
-  padding: 12px 0;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  border-radius: 14px;
+}
+
+.admin-sidebar.collapsed .menu-icon {
+  font-size: 1.35rem;
 }
 
 .admin-sidebar.collapsed .user-mini {
   justify-content: center;
 }
 
-.admin-sidebar.collapsed .btn-toggle-sidebar {
-  transform: rotate(180deg);
+/* ── TOOLTIPS EN MODO MINI ── */
+.admin-sidebar.collapsed [data-tooltip] {
+  position: relative;
+}
+
+.admin-sidebar.collapsed [data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  transform: translateY(-50%) scale(0.95);
+  background: rgba(13, 21, 38, 0.95);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 10px;
+  white-space: nowrap;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s var(--ease-smooth), transform 0.2s var(--ease-smooth);
+  z-index: 2000;
+}
+
+.admin-sidebar.collapsed [data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
 }
 
 /* Header del Sidebar */
@@ -136,16 +183,17 @@ html, body {
 
 .brand-emblem {
   position: relative;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #1d4ed8 0%, #0ea5e9 100%);
   border-radius: 12px;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   flex-shrink: 0;
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+  transition: var(--transition);
 }
 
 .brand-glow {
@@ -182,7 +230,7 @@ html, body {
   margin-top: 2px;
 }
 
-/* Botón Toggle Colapsar */
+/* Botón Toggle Integrado */
 .btn-toggle-sidebar {
   width: 32px;
   height: 32px;
@@ -204,11 +252,15 @@ html, body {
   color: var(--text-primary);
 }
 
+.toggle-arrow {
+  transition: transform 0.3s ease;
+}
+
 /* Menú */
 .sidebar-menu {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   margin-top: 16px;
   flex: 1;
 }
@@ -232,15 +284,16 @@ html, body {
 }
 
 .menu-item:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
+  transform: translateX(2px);
 }
 
 .menu-item.active {
-  background: rgba(37, 99, 235, 0.15);
-  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(37, 99, 235, 0.16);
+  border-color: rgba(59, 130, 246, 0.4);
   color: var(--blue-light);
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
 }
 
 .menu-icon { font-size: 1.15rem; flex-shrink: 0; }
@@ -266,6 +319,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
 }
 
 .avatar-wrap {
@@ -309,7 +363,7 @@ html, body {
   overflow-x: hidden;
   overflow-y: auto;
   background: var(--black-deep);
-  min-width: 0; /* previene desbordamiento en flex layout */
+  min-width: 0;
 }
 
 /* Top Header Bar */
@@ -339,6 +393,30 @@ html, body {
   cursor: pointer;
   align-items: center;
   justify-content: center;
+}
+
+/* Botón de expandir topbar cuando el menú está colapsado */
+.btn-expand-topbar {
+  display: none;
+  width: 34px; height: 34px;
+  background: rgba(37, 99, 235, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 10px;
+  color: var(--blue-light);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.btn-expand-topbar:hover {
+  background: rgba(37, 99, 235, 0.3);
+  transform: scale(1.05);
+}
+
+/* Mostrar botón de expandir en topbar cuando el sidebar tiene .collapsed */
+.admin-sidebar.collapsed ~ .admin-main .btn-expand-topbar {
+  display: flex;
 }
 
 .page-title-wrap {
@@ -475,7 +553,7 @@ html, body {
   padding: 20px 24px;
   flex-direction: column;
   gap: 16px;
-  min-height: 0; /* Importante para que el mapa o la tabla escroleen internamente */
+  min-height: 0;
 }
 
 .admin-tab.active { display: flex; }
@@ -719,6 +797,7 @@ html, body {
    ============================ */
 @media (max-width: 768px) {
   .btn-mobile-menu { display: flex; }
+  .btn-expand-topbar { display: none !important; }
 
   .admin-sidebar {
     position: fixed;
